@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Counter</title>
+</head>
+<body>
+    <h1>Real-time Counter: <span id="counter">0</span></h1>
+    <button id="incrementBtn">Increment</button>
+
+    <script>
+        // Establish WebSocket connection
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/counter/');
+
+        // Listen for messages from the server
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            document.getElementById('counter').textContent = data.counter;
+        };
+
+        // Send increment action when the button is clicked
+        document.getElementById('incrementBtn').addEventListener('click', function() {
+            socket.send(JSON.stringify({ 'action': 'minus' }));
+        });
+
+        // Automatically click the increment button every 2 seconds
+        setInterval(function() {
+            document.getElementById('incrementBtn').click();
+        }, 2000); // Interval in milliseconds (2000ms = 2 seconds)
+    </script>
+</body>
+</html>

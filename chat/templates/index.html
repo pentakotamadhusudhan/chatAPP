@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Counter</title>
+</head>
+<body>
+    <h1>Real-time Timer: <span id="timer">0</span></h1>
+    <h1>Real-time Counter: <span id="counter">0</span></h1>
+
+    <script>
+        // WebSocket connection for timer
+        const timerSocket = new WebSocket('ws://' + window.location.host + '/ws/timer/');
+
+        // Listen for messages from the server for the timer
+        timerSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            document.getElementById('timer').textContent = data.counter;
+        };
+
+        // Continuously send increment action every 1 second for timer
+        setInterval(function() {
+            timerSocket.send(JSON.stringify({ 'action': 'increment' }));
+        }, 1000); // Increment every 1 second
+
+        
+        // WebSocket connection for counter
+        const counterSocket = new WebSocket('ws://' + window.location.host + '/ws/counter/');
+
+        // Listen for messages from the server for the counter
+        counterSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            document.getElementById('counter').textContent = data.counter;
+        };
+
+        // Continuously send decrement action every 2 seconds for counter
+        setInterval(function() {
+            counterSocket.send(JSON.stringify({ 'action': 'minus' }));
+        }, 2000); // Decrement every 2 seconds
+    </script>
+</body>
+</html>
