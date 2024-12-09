@@ -7,17 +7,8 @@ from rest_framework import status
 from NewChatProject.genericresponse import returnresponse
 from django.contrib.auth.models import User
 from django.db.models import Q
+from .models import UserProfile,FriendsModel
 
-
-class GetFriendsListView(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-    def get(self,request,):
-        queryset = User.objects.all()
-        ser = self.serializer_class(queryset,many=True)
-        response =  returnresponse(status_code=200,data=ser.data,message="Message sent successfully")
-        return Response(response, status=status.HTTP_201_CREATED)
 
 
 class ChatViews(generics.GenericAPIView):
@@ -25,6 +16,7 @@ class ChatViews(generics.GenericAPIView):
     serializer_class = ChatPostSerializers
 
     def post(self, *args, **kwargs):
+        print
         serializer = self.get_serializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

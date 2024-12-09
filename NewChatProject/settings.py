@@ -79,14 +79,21 @@ WSGI_APPLICATION = 'NewChatProject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'chatApp',                      
+#         'USER': 'postgres',
+#         'PASSWORD': 'Madhu@12',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'madhuDataBase',                      
-        'USER': 'postgres',
-        'PASSWORD': 'Madhu@12',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -153,3 +160,11 @@ CORS_ALLOW_CREDENTIALS = True
 #     "*",  # Your frontend URL
 #     # You can add other allowed origins here if necessary
 # ]
+
+import os
+
+STATIC_URL = 'static/'
+STATIC_ROOT = '/static/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

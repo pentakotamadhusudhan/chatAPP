@@ -1,7 +1,7 @@
-
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from rest_framework import generics
-
+from .models import FriendsModel
 from NewChatProject.genericresponse import returnresponse
 from .serializers import *
 from django.contrib.auth.models import User
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 class UserCreateView(generics.GenericAPIView):
     serializer_class = UserSerializer
-    queryset = User.objects.all()
+    queryset = UserProfile.objects.all()
 
     def post(self, request):
         logger.info(f"Received data: {request.data}")
@@ -53,11 +53,9 @@ class UserCreateView(generics.GenericAPIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
-
-
 class UserLoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
-    queryset = User.objects.all()
+    queryset = UserProfile.objects.all()
 
     def post(self, request):
         try:
@@ -68,7 +66,7 @@ class UserLoginView(generics.GenericAPIView):
             print("Password received:", password)
 
             # user = authenticate(username=username, password=password)
-            user = User.objects.get(username=username, password=password)
+            user = UserProfile.objects.get(username=username, password=password)
             print("Password:", user)
 
             if user is not None:
@@ -94,18 +92,92 @@ class UserLoginView(generics.GenericAPIView):
             return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
-
-
-
-
-
 class GetFriendByIDView(generics.ListAPIView):
-    queryset = User.objects.all()
+    queryset = UserProfile.objects.all()
     serializer_class = UserSerializer
 
     def get(self,request,friendID):
         print(friendID)
-        queryset = User.objects.get(id=friendID)
+        queryset = UserProfile.objects.get(id=friendID)
         ser = self.serializer_class(queryset)
         response = returnresponse(status_code=200,data=ser.data,message="friend founded")
         return Response(response, status=status.HTTP_200_OK)
+    
+
+class FriendRequestView(generics.GenericAPIView):
+    serializer_class = FriendRequestSerializer
+    queryset = FriendsModel.objects.all()
+
+    def post(self, request):
+        logger.info(f"Received data: {request.data}")
+       
+        try:
+            serializer = self.serializer_class(data=request.data)
+            print("Received data",request.data)
+            if serializer.is_valid():
+                print("Rebdbbd bsd")
+                
+                user = serializer.save()
+                response = returnresponse(status_code=200,data=serializer.data)
+                return Response(response, status=status.HTTP_201_CREATED)
+            else:
+            
+                logger.warning(f"Serializer validation failed: {serializer.errors}")
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            
+            logger.error(f"Error creating user: {str(e)}")
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+class FriendRequestUpdateView(generics.GenericAPIView):
+
+    serializer_class = FriendRequestSerializer
+    queryset = FriendsModel.objects.all()
+
+    def put(self, request, friendRequestID):
+        try:
+            friend_data =  get_object_or_404(FriendsModel,id = friendRequestID)
+            serializer = self.serializer_class(instance= friend_data,data = request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                response = returnresponse(status_code=200,data=serializer.data)
+                return Response(response, status=status.HTTP_200_OK)
+            
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+        except Exception as e:
+            logger.error(f"Error updating friend request: {str(e)}")
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+class FindFriendsView(generics.GenericAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserSerializer
+
+    def get(self,request,):
+        queryset = UserProfile.objects.all()
+        ser = self.serializer_class(queryset,many=True)
+        response =  returnresponse(status_code=200,data=ser.data,message="Message sent successfully")
+        return Response(response, status=status.HTTP_201_CREATED)
+
+
+
+class GetFriendsListView(generics.ListAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserSerializer
+
+    def get(self,request,):
+        li = []
+        friend_list =  FriendsModel.objects.filter(user1_id = 1, is_friend =False)
+        
+        for i in friend_list:
+            # queryset = UserProfile.objects.get(id =i.user2)
+            li.append(i.user2)
+        ser = UserSerializer(li,many=True)
+        response =  returnresponse(status_code=200,data=ser.data,message="Message sent successfully")
+        return Response(response, status=status.HTTP_201_CREATED)
