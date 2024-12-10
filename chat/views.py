@@ -41,16 +41,19 @@ class UserCreateView(generics.GenericAPIView):
                 logger.info(f"User created successfully: {user.username}")
 
                 # Return the serialized user data (response can include user details or token)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                response = returnresponse(status_code=200, data=serializer.data,message="User created successfully")
+                return Response(response, status=status.HTTP_201_CREATED)
             else:
                 # Log the validation errors
                 logger.warning(f"Serializer validation failed: {serializer.errors}")
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                response = returnresponse(status_code=400,message="User creation failed")
+                return Response(response, status=400)
 
         except Exception as e:
             # Log the exception details for debugging
             logger.error(f"Error creating user: {str(e)}")
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            response = returnresponse(status_code=500,message="User creation failed")
+            return Response(response, status=status.HTTP_201_CREATED)
         
 
 class UserLoginView(generics.GenericAPIView):
