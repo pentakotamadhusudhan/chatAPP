@@ -51,6 +51,7 @@ class ChatGetConsumer(AsyncWebsocketConsumer):
             }))
     @sync_to_async
     def get_chat_data(self):
+        
         queryset = ChatModel.objects.filter(Q(from_user=self.from_user, to_user=self.to_user) | Q(from_user=self.to_user, to_user=self.from_user))
         serializer = ChatPostSerializers(queryset, many=True)
         

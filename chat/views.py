@@ -174,9 +174,9 @@ class GetFriendsListView(generics.ListAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserSerializer
 
-    def get(self,request,):
+    def get(self,request):
         li = []
-        friend_list =  FriendsModel.objects.filter(user1_id = 1, is_friend =False)
+        friend_list =  FriendsModel.objects.filter(user1_id = 1, is_friend =True)
         
         for i in friend_list:
             # queryset = UserProfile.objects.get(id =i.user2)
