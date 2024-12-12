@@ -184,3 +184,31 @@ class GetFriendsListView(generics.ListAPIView):
         ser = UserSerializer(li,many=True)
         response =  returnresponse(status_code=200,data=ser.data,message="Message sent successfully")
         return Response(response, status=status.HTTP_201_CREATED)
+    
+
+
+
+
+class UserUpdateView(generics.GenericAPIView):
+    serializer_class = UserSerializer
+
+    def patch(self, request, user_id):
+        logger.info(f"Received data for user update: {request.data}")
+        try:
+            user = get_object_or_404(UserProfile, id=user_id)
+            serializer = self.serializer_class(instance=user, data=request.data, partial=True)
+            
+            if serializer.is_valid():
+                user = serializer.save()
+                logger.info(f"User updated successfully: {user.username}")
+                response = returnresponse(status_code=200, data=serializer.data, message="User updated successfully")
+                return Response(response, status=status.HTTP_200_OK)
+            else:
+                logger.warning(f"Serializer validation failed: {serializer.errors}")
+                response = returnresponse(status_code=400, message="Validation failed", data=serializer.errors)
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            logger.error(f"Error updating user: {str(e)}")
+            response = returnresponse(status_code=500, message="Internal server error")
+            return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

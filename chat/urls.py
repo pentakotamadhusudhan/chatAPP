@@ -9,6 +9,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('count', views.count, name='count'),
     path('user', views.UserCreateView.as_view(), name='user_create'),
+    path('userupdate/<int:user_id>', views.UserUpdateView.as_view(), name='user_update'),
     path('login', views.UserLoginView.as_view(), name='UserLoginView'),
     path('getfriends', views.GetFriendsListView.as_view(), name='getfirends'),
     path('findfriends', views.FindFriendsView.as_view(), name='findfirends'),
