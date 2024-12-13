@@ -3,3 +3,4 @@
 __pycached__
 chat/__pycache__/
 chat/__pycache__/urls.cpython-312.pyc
+*.rdb

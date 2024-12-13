@@ -16,14 +16,16 @@ class ChatViews(generics.GenericAPIView):
     serializer_class = ChatPostSerializers
 
     def post(self, *args, **kwargs):
-        print
-        serializer = self.get_serializer(data=self.request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        response =  returnresponse(status_code=200,data=None,message="Message sent successfully")
-        return Response(response, status=status.HTTP_201_CREATED)
+        try:
+            serializer = self.get_serializer(data=self.request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            response =  returnresponse(status_code=200,data=serializer.data,message="Message sent successfully")
+            return Response(response, status=status.HTTP_201_CREATED)
 
-
+        except :
+            response = returnresponse(status_code=400,message="Failed to send message")
+            return Response(response, status=400)
 
 class ChatListViews(generics.ListAPIView):
     queryset = ChatModel.objects.all()
